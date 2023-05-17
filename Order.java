@@ -1,90 +1,93 @@
-/* Nguyễn Thị Thảo Anh */
 package bai1;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
 public class Order {
+	private static int currentOrderID = 1;
+	private static Order currentOrder;
+	private int orderID;
+	private LocalDate orderDate;
+	private List<OrderDetail>lineItems;
+	private int count = 0;
+	
+	public Order() {		
+	}
+	
+	public Order (int orderID, LocalDate orderDate, int count) {
+		this.orderID = orderID;
+		this.orderDate = orderDate;
+		this.count = count;
+	}
+	public Order(int orderId, LocalDate orderDate, OrderDetail[] lineItems, int count) {
+		this.orderID = orderID;
+		this.orderDate = orderDate;
+		this.lineItems = new ArrayList<>(Arrays.asList(lineItems));
+		this.count = count;
+	}
+	public Order (LocalDate orderDate) {
+		if(currentOrder == null) {
+			currentOrder = this;
+			this.orderID = currentOrderID++;
+			this.orderDate = orderDate;
+			this.lineItems = new ArrayList<>();
+			this.count = ++count;
+		}else {
+			this.orderID = currentOrder.getOrderID();
+			this.orderDate = orderDate;
+			this.lineItems = currentOrder.getLineItems();
+			this.count = currentOrder.getCount();
+		}
+	}
+	public static int getCurrentOrderID() {
+		return currentOrderID;
+	}
+	public int getOrderID() {
+		return orderID;
+	}
+	public LocalDate getOrderDate() {
+		return orderDate;
+	}
+	public List<OrderDetail>  getLineItems() {
+		return lineItems;
+	}
+	public int getCount() {
+		return count;
+	}
+	public void setOrderDate(LocalDate orderDate) {
+		this.orderDate = orderDate;		
+	}
+	public void addLineItems(Product p,int quatity) {
+		if (currentOrder ==null) {
+			currentOrder = new Order(LocalDate.now());
+		}
+		lineItems.add(new OrderDetail (quatity,p));
+	}
+	public double calcTotalCharge() {
+		double totalCharge = 0;
+		for (OrderDetail s : lineItems) {
+			totalCharge += s.calcTotalPrice();
+		}
+		return totalCharge;
+	}
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Ma Order:").append(orderID).append("Ngay mua:").append(orderDate).append("\n");
+		sb.append(String.format("|%-15s|%-25s|%-15s|%-20s|%-10s|%-20s|%n","STT","MaSP","Mo ta","Don Gia","So luong","Thanh tien"));
+		for(int i =0;i<lineItems.size();i++) {
+			OrderDetail orderDetail =lineItems.get(i);
+			Product product = orderDetail.getProduct();
+			sb.append(String.format("|%-15s|%-25s|%-15s|%-20s|%-10s|%-20s|%n",i+1,product.getProductID(),product.getDescription(),product.getPrice(),orderDetail.getQuatity(),orderDetail.calcTotalPrice()));	
+		}
+		sb.append("Tong thanh toan la:").append(calcTotalCharge());
+		return sb.toString();
+	}
 
-    private int orderID;
-    private LocalDate orderDate;
-    private List<OrderDetail> lineitems = new ArrayList<OrderDetail>();
-    private int count;
-    OrderDetail orde;
-    Product pro = new Product();
-    Scanner sc = new Scanner(System.in);
-
-    public Order() {
-    }
-
-    public Order(int orderID, LocalDate orderDate, List<OrderDetail> lineitems, int count) {
-        this.orderID = orderID;
-        this.orderDate = orderDate;
-        this.lineitems = new ArrayList<>();
-        this.count = 0;
-    }
-
-    public int getOrderID() {
-        return orderID;
-    }
-
-    public LocalDate getOrderDate() {
-        return orderDate;
-    }
-
-    public List<OrderDetail> getLineitems() {
-        return lineitems;
-    }
-
-    public void setOrderDate(LocalDate orderDate) {
-        this.orderDate = orderDate;
-    }
-
-    public void addLineItems(Product p, int quatity) {
-        if (count < 20) {
-            lineitems.add(new OrderDetail(quatity, p));
-            count++;
-        } else {
-            System.out.println("toi da 20 san pham cho 1 hoa don");
-        }
-    }
-
-    public double calcTotalCharge() {
-        double totalcharge = 0;
-        for (OrderDetail lineitem : lineitems) {
-            totalcharge += lineitem.calcTotalPrice();
-        }
-        return totalcharge;
-    }
-
-    public void Nhap() {
-        sc.nextLine();
-        System.out.println("Nhap ma hoa don: ");
-        String productID = sc.nextLine();
-        System.out.println("Nhap mo ta san pham: ");
-        String description = sc.nextLine();
-        System.out.println("Nhap gia san pham: ");
-        double Price = sc.nextDouble();
-        System.out.println("Nhap so luong: ");
-        int quatity = sc.nextInt();
-
-        pro = new Product(description, productID, Price);
-        addLineItems(pro, quatity);
-        System.out.println("Da tao hoa don");
-    }
-
-    public void in() {
-        System.out.println("Ma hoa don: " + orderID);
-        System.out.println("Ngay mua: " + orderDate.now());
-        System.out.println(String.format("|%-20s|%-20s|%-20s|%-20s|%-20s|",
-                "Ma san pham", "Mo ta san pham", "Gia", "So luong", "Thanh tien"));
-        System.out.println("========================================================================================================");
-        for (OrderDetail lineitem : lineitems) {
-            System.out.println(String.format("|%-20s|%-20s|%-20s|%-20s|%-20s|",
-                    pro.getProduct(), pro.getDescription(), pro.getPrice(), lineitem.getQuatity(), lineitem.calcTotalPrice()));
-        }
-        System.out.print("Tong tien: " );System.out.println(calcTotalCharge());
-    }
 }
+
+
+
+
+
